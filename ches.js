@@ -1,11 +1,11 @@
+import { ChessGame } from "./chessLibs/chess_game.js";
+
+
+
 const canvas = document.getElementById("base");
 const ctx = canvas.getContext("2d");
 
-// Set line width
-ctx.lineWidth = 3;
 
-// Wall
-var max = 700;
 
 
 
@@ -276,104 +276,60 @@ var taslar =
             isAlive: true,
             team: 1,
         },
-    ];
+];
 
 
+const cg = new ChessGame(taslar, canvas, ctx);
 
+var mmPos = {x: 0, y: 0};
 
-class ChessGame {
-    constructor(tData) {
-        this.tData = tData;
-    }
-
-    getTas = async (x, y, callBack) => {
-        var tb = false;
-        await this.tData.forEach(element => {
-            if (element.position.x == x && element.position.y == y) {
-                callBack(true, element);
-                tb = true;
-            }
-        });
-
-        if (!tb)
-            callBack(false, false);
-    }
-
-    run = () => {
-        for (let i = 0; i < 8; i++) {
-
-            var col = i % 2 == 0 ? false : true;
-
-            for (let i2 = 0; i2 < 8; i2++) {
-                col ? ctx.fillStyle = "rgb(170, 170, 170)" : ctx.fillStyle = "rgb(100, 100, 100)";
-
-                ctx.fillRect((max / 8) * i2, (max / 8) * i, max / 8, max / 8);
-
-                this.getTas(i2, i, (status, val) => {
-                    if (status && val.isAlive) {
-                        ctx.font = "20px serif";
-                        ctx.fillStyle = val.team == 0 ? "black" : "red";
-                        ctx.fillText(val.name, ((max / 8) * i2) + ((max / 8 / 2) - (ctx.measureText(val.name).width / 2)), (((max / 8) * i) + 7) + ((max / 8) / 2));
-                    }
-                });
-
-
-                col = !col;
-            }
-        }
-    }
-
-
-    makeMove = async (id, x, y) => {
-        var rVal = "";
-        await this.tData.forEach(element => {
-            if (element.id == id) {
-                if (element.position.x == x && element.position.y == y) {
-                    rVal = "????? are you damn ?????";
-                }
-                else {
-                    this.getTas(x, y, (status, val) => {
-                        if (!status) {
-                            rVal = "work";
-                            element.position.x = x;
-                            element.position.y = y;
-                        }
-                        else {
-                            if (val.team != element.team) {
-                                rVal = "work";
-                                if (val.isAlive) {
-                                    val.isAlive = false;
-                                    element.position.x = x;
-                                    element.position.y = y;
-                                }
-                                else {
-                                    element.position.x = x;
-                                    element.position.y = y;
-                                }
-                            }
-                            else {
-                                rVal = "No allready defined other block 2222 ";
-                            }
-                        }
-                    });
-                }
-
-            }
-        });
-
-        return rVal;
+const getMousePos = (cnvs, evt) => {
+    var rect = cnvs.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
     };
+};
 
-    getAllData = () => {
-        return this.tData;
-    };
+const onMoueUpdateEvent = (event) => {
+    mmPos = getMousePos(cg.canvas, event);
+};
+
+var lastCalledTime;
+var fps;
+
+function requestAnimFrame() {
+
+  if(!lastCalledTime) {
+     lastCalledTime = Date.now();
+     fps = 0;
+     return;
+  }
+  var delta = (Date.now() - lastCalledTime)/1000;
+  lastCalledTime = Date.now();
+  fps = 1 / delta;
 }
 
+const render = () => {
+    console.log("render");
+    
+    cg.ctx.font = "19px serif";
+    cg.ctx.fillStyle = 1 ? "black" : "red";
 
-const cg = new ChessGame(taslar);
+    cg.ctx.fillText("x: " + mmPos.x + " | y: " + mmPos.y, mmPos.x, mmPos.y);
+    
 
-(async () => {
-    setInterval(() => {
-        cg.run();
-    }, 100);
-})();
+
+
+    cg.ctx.font = "19px serif";
+    cg.ctx.fillStyle = 1 ? "black" : "red";
+
+    cg.ctx.fillText("fps: " + parseInt(fps), 5, 20);
+
+
+    requestAnimFrame();
+}
+
+cg.canvas.addEventListener("mousemove", onMoueUpdateEvent);
+
+cg.registerEvent("draw", {}, (p) => render(p));
