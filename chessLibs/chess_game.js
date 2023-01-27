@@ -1,4 +1,5 @@
 import { chessRoles } from "./crules.js";
+import { loadPlugins } from "./pluginmanager.js";
 import { registerEvent, runEvents, runEvent } from "./chessgameevents.js";
 // Set line width
 
@@ -12,6 +13,7 @@ export class ChessGame {
         this.ctx.lineWidth = 3;
         
         this.registerEvents();
+        loadPlugins(this);
 
         (async () => {
             setInterval(() => {
@@ -108,7 +110,7 @@ export class ChessGame {
 
 
     registerEvents = () => {
-        //registerEvent("draw", {test: 1, turkey: 558}, ({test, turkey}) => console.log("YES WORK!" + test + " | " + turkey));
+        //registerEvent("draw", {test: 1, turkey: 558}, ({test, turkey}) => console.log("YES WORK!" + test + " | " + turkey));hasirciogli
     };
 
     registerEvent = (where, param, fun) => {
