@@ -280,5 +280,3 @@ var taslar =
 
 
 const cg = new ChessGame(taslar, canvas, ctx);
-
-cg.loadPlugin("fpspos");

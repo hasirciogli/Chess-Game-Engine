@@ -107,8 +107,6 @@ export class ChessGame {
         return this.tData;
     };
 
-
-
     registerEvents = () => {
         //registerEvent("draw", {test: 1, turkey: 558}, ({test, turkey}) => console.log("YES WORK!" + test + " | " + turkey));hasirciogli
     };
